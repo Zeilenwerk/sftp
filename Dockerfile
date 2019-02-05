@@ -17,7 +17,7 @@ RUN addgroup sftp \
     && adduser -D sftp -G sftp \
     && echo 'sftp:temporary-password' | chpasswd \
     && mkdir -p /etc/dropbear \
-    && chown -R sftp:sftp /etc/shadow
+    && chown -R :sftp /etc/shadow
 
 COPY scripts/*.sh /usr/local/bin/
 
