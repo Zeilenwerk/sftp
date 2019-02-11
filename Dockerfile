@@ -1,29 +1,19 @@
 FROM alpine:latest
 
-ARG ECDSA_HOST_KEY
-ENV ECDSA_HOST_KEY=$ECDSA_HOST_KEY
-ARG RSA_HOST_KEY
-ENV RSA_HOST_KEY=$RSA_HOST_KEY
-ARG DSS_HOST_KEY
-ENV DSS_HOST_KEY=$DSS_HOST_KEY
-
 RUN apk add --no-cache \
     dropbear \
     openssh-client \
     openssh-sftp-server \
-    busybox-suid
-
-RUN addgroup sftp \
-    && adduser -D sftp -G sftp \
-    && echo 'sftp:temporary-password' | chpasswd \
+    && chgrp -R 0 /etc/passwd \
+    && chmod -R g=u /etc/passwd \
     && mkdir -p /etc/dropbear \
-    && chown -R :sftp /etc/shadow
+    && chgrp -R 0 /etc/dropbear \
+    && chmod -R g=u /etc/dropbear
 
-COPY scripts/*.sh /usr/local/bin/
+COPY scripts/docker-entrypoint.sh /usr/local/bin/
 
-RUN create-host-keys.sh
+USER 1001
 
-USER sftp
 EXPOSE 2222
 
 ENTRYPOINT ["docker-entrypoint.sh"]
